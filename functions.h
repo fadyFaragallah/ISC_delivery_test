@@ -9,4 +9,7 @@ void printChar(char c);
 void printString(char* string);
 void ADC_init(void);
 int read_temp(void);
+void portF_init(void);
+int charToInt(char);
+void printNum(uint32_t);
 #endif /* FUNCTIONS_H_ */

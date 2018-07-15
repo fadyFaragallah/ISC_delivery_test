@@ -1,20 +1,9 @@
 #include <stdint.h>
+#include<stdio.h>
 #include"functions.h"
 #include"tm4c123gh6pm.h"
-void portF_init(void)
-    {
-        int volatile delay;
-        SYSCTL_RCGCGPIO_R |=0x20;  //enable clock for port f
-        delay=0; // delay to allow port f to start as it needs 2 clock cycles
-        GPIO_PORTF_LOCK_R = 0x4C4F434B;
-        GPIO_PORTF_CR_R = 0x1F;
-        GPIO_PORTF_AMSEL_R = 0x00;
-        GPIO_PORTF_PCTL_R = 0x00000000;
-        GPIO_PORTF_DIR_R = 0x0E;
-        GPIO_PORTF_AFSEL_R = 0x00000000;
-        GPIO_PORTF_PUR_R = 0x11;
-        GPIO_PORTF_DEN_R = 0x1F;
-    }
+#include"stdlib.h"
+
 void systick_init(void)
 {
     NVIC_ST_CTRL_R = 0;
@@ -86,3 +75,39 @@ int read_temp(void)
     return result;
 }
 
+void portF_init(void)
+{
+    int volatile delay;
+    SYSCTL_RCGCGPIO_R |=0x20;  //enable clock for port f
+    delay=0; // delay to allow port f to start as it needs 2 clock cycles
+    GPIO_PORTF_LOCK_R = 0x4C4F434B;
+    GPIO_PORTF_CR_R = 0x1F;
+    GPIO_PORTF_AMSEL_R = 0x00;
+    GPIO_PORTF_PCTL_R = 0x00000000;
+    GPIO_PORTF_DIR_R = 0x0E;
+    GPIO_PORTF_AFSEL_R = 0x00000000;
+    GPIO_PORTF_PUR_R = 0x11;
+    GPIO_PORTF_DEN_R = 0x1F;
+
+    //for the interrupt of port f
+    GPIO_PORTF_IS_R &=~(1<<0);
+    GPIO_PORTF_IBE_R &=~(1<<0);
+    GPIO_PORTF_IEV_R |=(1<<0);
+    GPIO_PORTF_ICR_R |=(1<<0);
+    GPIO_PORTF_IM_R |=(1<<0);
+    NVIC_EN0_R |=(1<<30);
+    NVIC_PRI7_R = (NVIC_PRI7_R & 0xFF00FFFF)|0x00A00000; //priority = 5
+
+}
+
+int charToInt(char a)
+{
+    return (int) (a-'0');
+}
+
+void printNum(uint32_t num)
+{
+    char str[10];
+    sprintf(str,"%d",num);
+    printString(str);
+}
